@@ -1,0 +1,127 @@
+#!/bin/sh
+# Guided DMG inspector/extractor. macOS applications are not Linux programs;
+# optional launching is attempted only through Darling after an explicit prompt.
+set -eu
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+if [ -z "$FILE" ]; then
+  if command -v zenity >/dev/null 2>&1; then
+    FILE=$(zenity --file-selection --title="Choose a macOS disk image" \
+      --file-filter='DMG disk images | *.dmg *.DMG' 2>/dev/null) || exit 0
+  else
+    echo "Choose a .dmg file in the file manager or run: aether-dmg /path/to/file.dmg" >&2
+    exit 2
+  fi
+fi
+[ -f "$FILE" ] || { aether_notify "DMG Installer" "File not found: $FILE"; exit 2; }
+FILE=$(realpath "$FILE")
+
+if ! command -v 7z >/dev/null 2>&1; then
+  aether_notify "DMG Installer" "7zip is required. Install it with: sudo apt install 7zip"
+  exit 127
+fi
+if ! command -v dmg2img >/dev/null 2>&1; then
+  aether_notify "DMG Installer" "dmg2img is required for conversion fallback. Install it with: sudo apt install dmg2img"
+  exit 127
+fi
+
+BASE=$(basename "$FILE")
+NAME=${BASE%.*}
+DEST="$HOME/Downloads/${NAME}-contents"
+if command -v zenity >/dev/null 2>&1; then
+  CHOSEN=$(zenity --file-selection --directory --title="Choose where to extract $BASE" \
+    --filename="$HOME/Downloads/" 2>/dev/null) || exit 0
+  CHOSEN=${CHOSEN%/}
+  case "$CHOSEN" in
+    *"$NAME-contents") DEST="$CHOSEN" ;;
+    *) DEST="$CHOSEN/$NAME-contents" ;;
+  esac
+fi
+[ ! -e "$DEST" ] || { aether_notify "DMG Installer" "Destination already exists: $DEST\nChoose another folder or rename it first."; exit 1; }
+
+if ! aether_confirm "Extract macOS disk image?" \
+  "$BASE will be extracted to:\n$DEST\n\nThis makes the files available in Linux. macOS apps inside may still not run on AetherOS."; then
+  exit 0
+fi
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/aether-dmg.XXXXXX")
+trap 'rm -rf "$TMP"' EXIT INT TERM
+mkdir -p "$TMP/root" "$(dirname "$DEST")"
+
+# Per the linked guide, first try extracting the DMG directly with 7z.
+if ! 7z x -y "$FILE" "-o$TMP/root" >"$TMP/7z.log" 2>&1; then
+  # If direct extraction fails, convert the image to raw/ISO-compatible form
+  # and try unpacking the result. APFS and encrypted images remain unsupported.
+  rm -rf "$TMP/root"
+  mkdir -p "$TMP/root"
+  if ! dmg2img -i "$FILE" -o "$TMP/disk.img" >"$TMP/convert.log" 2>&1 ||
+     ! 7z x -y "$TMP/disk.img" "-o$TMP/root" >"$TMP/7z-converted.log" 2>&1; then
+    DETAILS=$(tail -n 8 "$TMP/7z.log" 2>/dev/null || true)
+    aether_notify "DMG extraction failed" "This image may use APFS, encryption, or an unsupported format.\n\n$DETAILS"
+    exit 1
+  fi
+fi
+
+if ! find "$TMP/root" -mindepth 1 -print -quit | grep -q .; then
+  aether_notify "DMG Installer" "The disk image did not contain extractable files."
+  exit 1
+fi
+mv "$TMP/root" "$DEST"
+
+APPS=$(find "$DEST" -maxdepth 5 -name '*.app' -type d 2>/dev/null | head -20)
+BINS=$(find "$DEST" -path '*/Contents/MacOS/*' -type f 2>/dev/null | head -20)
+REPORT="$TMP/report.txt"
+{
+  echo "DMG contents extracted successfully"
+  echo "Source: $FILE"
+  echo "Files: $DEST"
+  echo
+  if [ -n "$APPS" ]; then
+    echo "macOS application bundles found:"
+    printf '  %s\n' "$APPS"
+  else
+    echo "No .app bundles found."
+  fi
+  echo
+  echo "Important: extracting a Mac app does not make it a Linux app. Most .app bundles require macOS."
+  if command -v darling >/dev/null 2>&1; then
+    echo "Darling is installed; limited compatibility may be tried for some applications."
+  else
+    echo "Darling is not installed. AetherOS can optionally install it with: sudo aether-pack install darling"
+  fi
+} >"$REPORT"
+
+if command -v zenity >/dev/null 2>&1; then
+  zenity --text-info --title="DMG extraction complete" --width=760 --height=500 \
+    --filename="$REPORT" 2>/dev/null || true
+  zenity --info --title="DMG Installer" --text="Files were extracted to:\n$DEST\n\nOpen this folder now?" 2>/dev/null && \
+    xdg-open "$DEST" >/dev/null 2>&1 || true
+else
+  cat "$REPORT"
+fi
+
+# Optional launch for one app only, after a warning and a clear user choice.
+if command -v darling >/dev/null 2>&1 && [ -n "$APPS" ]; then
+  APP_COUNT=$(printf '%s\n' "$APPS" | wc -l)
+  if [ "$APP_COUNT" -eq 1 ]; then
+    APP=$(printf '%s\n' "$APPS" | head -1)
+    EXEC=$(python3 - "$APP/Contents/Info.plist" <<'PY'
+import plistlib, sys
+try:
+    with open(sys.argv[1], "rb") as stream:
+        print(plistlib.load(stream).get("CFBundleExecutable", ""))
+except (OSError, plistlib.InvalidFileException, ValueError):
+    print("")
+PY
+)
+    BIN="$APP/Contents/MacOS/$EXEC"
+    if [ -n "$EXEC" ] && [ -f "$BIN" ] && aether_confirm \
+      "Try this Mac app with Darling?" \
+      "$(basename "$APP") was extracted. Darling has limited macOS API and GUI support; many apps will not run. Continue?"; then
+      darling shell "/Volumes/SystemRoot$BIN"
+    fi
+  elif [ "$APP_COUNT" -gt 1 ]; then
+    aether_notify "Multiple Mac apps found" "Open $DEST and choose one app. Import each individually if you want to try it with Darling."
+  fi
+fi

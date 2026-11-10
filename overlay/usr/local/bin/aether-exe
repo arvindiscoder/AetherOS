@@ -1,0 +1,44 @@
+#!/bin/sh
+# Run a Windows .exe/.msi through Wine, with an isolated prefix and sane flags.
+set -eu
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+[ -n "$FILE" ] && [ -e "$FILE" ] || { aether_notify "Wine" "No file supplied"; exit 2; }
+shift || true
+YES=""
+for arg in "$@"; do [ "$arg" = "--yes" ] && YES="--yes"; done
+
+WINE=""
+for c in wine64 wine; do command -v "$c" >/dev/null 2>&1 && { WINE=$c; break; }; done
+if [ -z "$WINE" ]; then
+  if aether_confirm "Windows runtime missing" \
+      "The Wine pack is not installed (~450 MB). Install it now?"; then
+    exec foot -e sudo aether-pack install wine
+  fi
+  exit 127
+fi
+
+NAME=$(basename "$FILE" | sed 's/\.[^.]*$//' | tr -c 'A-Za-z0-9._-' '_' | cut -c1-48)
+PREFIX=${AETHER_WINEPREFIX:-$HOME/.local/share/aether/wine/$NAME}
+
+aether_confirm "Run Windows application?" \
+  "$(basename "$FILE")\n\nPrefix: $PREFIX\nWine: $WINE\n\nOnly run software you trust." "$YES" || exit 0
+
+mkdir -p "$PREFIX"
+export WINEPREFIX="$PREFIX"
+export WINEARCH=win64
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES="winemenubuilder.exe=d;mscoree,mshtml="
+export WINEDPI=96
+export MESA_GLTHREAD=true
+
+# First run initialises the prefix; suppress Mono/Gecko installer prompts.
+if [ ! -d "$PREFIX/drive_c" ]; then
+  "$WINE" wineboot -u >/dev/null 2>&1 || true
+fi
+
+case "$(printf '%s' "$FILE" | tr '[:upper:]' '[:lower:]')" in
+  *.msi) exec "$WINE" msiexec /i "$FILE" ;;
+  *)     exec "$WINE" "$FILE" ;;
+esac

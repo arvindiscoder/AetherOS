@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <core>
+    <decoration>server</decoration>
+    <gap>0</gap>
+    <!-- Tearing only for fullscreen games; desktop stays tear-free. -->
+    <adaptiveSync>fullscreen</adaptiveSync>
+    <allowTearing>fullscreen</allowTearing>
+    <autoEnableOutputs>yes</autoEnableOutputs>
+    <reuseOutputMode>yes</reuseOutputMode>
+    <xwaylandPersistence>yes</xwaylandPersistence>
+  </core>
+
+  <placement>
+    <policy>cascade</policy>
+    <cascadeOffset x="48" y="36" />
+  </placement>
+
+  <theme>
+    <name>aether-glass</name>
+    <cornerRadius>14</cornerRadius>
+    <keepBorder>yes</keepBorder>
+    <dropShadows>yes</dropShadows>
+    <titlebar>
+      <!-- Traffic-light order on the left: close, minimize, maximize. -->
+      <layout>close,iconify,max:</layout>
+      <showTitle>yes</showTitle>
+    </titlebar>
+    <font place="ActiveWindow">
+      <name>DejaVu Sans</name><size>10</size><weight>bold</weight>
+    </font>
+    <font place="InactiveWindow">
+      <name>DejaVu Sans</name><size>10</size>
+    </font>
+    <font place="MenuItem">
+      <name>DejaVu Sans</name><size>10</size>
+    </font>
+    <font place="OnScreenDisplay">
+      <name>DejaVu Sans</name><size>10</size>
+    </font>
+  </theme>
+
+  <windowSwitcher show="yes" preview="yes" outlines="yes" allWorkspaces="no">
+    <fields>
+      <field content="type" width="12%" />
+      <field content="trimmed_identifier" width="28%" />
+      <field content="title" width="60%" />
+    </fields>
+  </windowSwitcher>
+
+  <resistance>
+    <screenEdgeStrength>16</screenEdgeStrength>
+    <windowEdgeStrength>12</windowEdgeStrength>
+    <unSnapThreshold>20</unSnapThreshold>
+    <unMaximizeThreshold>120</unMaximizeThreshold>
+  </resistance>
+
+  <resize>
+    <popupShow>Nonpixel</popupShow>
+    <drawContents>yes</drawContents>
+    <minimumArea>8</minimumArea>
+    <cornerRange>12</cornerRange>
+  </resize>
+
+  <focus>
+    <followMouse>no</followMouse>
+    <raiseOnFocus>no</raiseOnFocus>
+  </focus>
+
+  <snapping>
+    <range>1</range>
+    <overlay enabled="yes"><delay inner="450" outer="450" /></overlay>
+    <topMaximize>yes</topMaximize>
+    <notifyClient>always</notifyClient>
+  </snapping>
+
+  <regions>
+    <region name="left"   x="0%"  y="0%"  width="50%" height="100%" />
+    <region name="right"  x="50%" y="0%"  width="50%" height="100%" />
+    <region name="center" x="12%" y="8%"  width="76%" height="84%" />
+  </regions>
+
+  <desktops>
+    <popupTime>700</popupTime>
+    <names>
+      <name>Desk</name>
+      <name>Web</name>
+      <name>Play</name>
+      <name>Work</name>
+    </names>
+  </desktops>
+
+  <keyboard>
+    <repeatRate>30</repeatRate>
+    <repeatDelay>500</repeatDelay>
+
+    <keybind key="A-Tab"><action name="NextWindow" /></keybind>
+    <keybind key="A-S-Tab"><action name="PreviousWindow" /></keybind>
+    <keybind key="A-F4"><action name="Close" /></keybind>
+    <keybind key="A-Space"><action name="ShowMenu" menu="client-menu" atCursor="no" /></keybind>
+
+    <keybind key="W-Return">
+      <action name="Execute" command="foot" />
+    </keybind>
+    <keybind key="W-d">
+      <action name="Execute" command="fuzzel" />
+    </keybind>
+    <keybind key="W-space">
+      <action name="Execute" command="aether-assistant" />
+    </keybind>
+    <keybind key="W-S-space">
+      <action name="Execute" command="aether-assistant --voice" />
+    </keybind>
+    <keybind key="W-e">
+      <action name="Execute" command="pcmanfm" />
+    </keybind>
+    <keybind key="W-b">
+      <action name="Execute" command="aether-browser" />
+    </keybind>
+    <keybind key="W-q">
+      <action name="Close" />
+    </keybind>
+    <keybind key="W-f">
+      <action name="ToggleFullscreen" />
+    </keybind>
+    <keybind key="W-a">
+      <action name="ToggleMaximize" />
+    </keybind>
+    <keybind key="W-s">
+      <action name="ToggleShade" />
+    </keybind>
+    <keybind key="W-Tab">
+      <action name="NextWindow" />
+    </keybind>
+    <keybind key="W-S-Tab">
+      <action name="PreviousWindow" />
+    </keybind>
+    <keybind key="W-Left">
+      <action name="SnapToEdge" direction="left" />
+    </keybind>
+    <keybind key="W-Right">
+      <action name="SnapToEdge" direction="right" />
+    </keybind>
+    <keybind key="W-Up">
+      <action name="SnapToEdge" direction="up" />
+    </keybind>
+    <keybind key="W-Down">
+      <action name="SnapToEdge" direction="down" />
+    </keybind>
+    <keybind key="W-1"><action name="GoToDesktop" to="1" /></keybind>
+    <keybind key="W-2"><action name="GoToDesktop" to="2" /></keybind>
+    <keybind key="W-3"><action name="GoToDesktop" to="3" /></keybind>
+    <keybind key="W-4"><action name="GoToDesktop" to="4" /></keybind>
+    <keybind key="W-S-1"><action name="SendToDesktop" to="1" /></keybind>
+    <keybind key="W-S-2"><action name="SendToDesktop" to="2" /></keybind>
+    <keybind key="W-S-3"><action name="SendToDesktop" to="3" /></keybind>
+    <keybind key="W-S-4"><action name="SendToDesktop" to="4" /></keybind>
+    <keybind key="W-l">
+      <action name="Execute" command="swaylock -f -c 0f1522" />
+    </keybind>
+    <keybind key="W-S-s">
+      <action name="Execute" command="sh -c 'grim -g &quot;$(slurp)&quot; - | wl-copy'" />
+    </keybind>
+    <keybind key="W-S-r">
+      <action name="Execute" command="aether-gamemode toggle" />
+    </keybind>
+    <keybind key="W-S-Escape">
+      <action name="Execute" command="aether-power" />
+    </keybind>
+    <keybind key="W-S-i">
+      <action name="Execute" command="foot -e sudo aether-install" />
+    </keybind>
+    <keybind key="W-S-p">
+      <action name="Execute" command="aether-pack-manager" />
+    </keybind>
+
+    <keybind key="XF86_AudioRaiseVolume">
+      <action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+" />
+    </keybind>
+    <keybind key="XF86_AudioLowerVolume">
+      <action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-" />
+    </keybind>
+    <keybind key="XF86_AudioMute">
+      <action name="Execute" command="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" />
+    </keybind>
+    <keybind key="XF86_MonBrightnessUp">
+      <action name="Execute" command="brightnessctl set +10%" />
+    </keybind>
+    <keybind key="XF86_MonBrightnessDown">
+      <action name="Execute" command="brightnessctl set 10%-" />
+    </keybind>
+  </keyboard>
+
+  <mouse>
+    <default />
+    <doubleClickTime>420</doubleClickTime>
+  </mouse>
+
+  <libinput>
+    <device category="default">
+      <naturalScroll>no</naturalScroll>
+      <tap>yes</tap>
+      <tapAndDrag>yes</tapAndDrag>
+      <disableWhileTyping>yes</disableWhileTyping>
+      <accelProfile>adaptive</accelProfile>
+      <scrollFactor>1.0</scrollFactor>
+    </device>
+    <device category="touchpad">
+      <naturalScroll>no</naturalScroll>
+      <clickMethod>clickfinger</clickMethod>
+      <tap>yes</tap>
+    </device>
+  </libinput>
+
+  <windowRules>
+    <!-- Native Wine and Wine-derived X11 windows get server decorations so
+         every emulated window is movable/resizable like a native one. -->
+    <windowRule identifier="wine*" serverDecoration="yes" />
+    <windowRule identifier="*wine*" serverDecoration="yes" />
+    <windowRule identifier="Waydroid" serverDecoration="yes" />
+    <windowRule identifier="waydroid*" serverDecoration="yes" />
+    <windowRule identifier="*" type="dialog" serverDecoration="yes" />
+  </windowRules>
+
+  <menu>
+    <ignoreButtonReleasePeriod>200</ignoreButtonReleasePeriod>
+    <showIcons>yes</showIcons>
+  </menu>
+</labwc_config>

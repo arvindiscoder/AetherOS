@@ -1,0 +1,38 @@
+#!/bin/sh
+# AetherOS MIME dispatcher. Double-clicking a foreign binary never executes it
+# without a confirmation dialog unless AETHER_TRUST=1 is set.
+set -eu
+
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+[ -n "$FILE" ] && [ -e "$FILE" ] || { aether_notify "AetherOS" "No file supplied"; exit 2; }
+shift || true
+
+# Strip an optional --yes and pass it to the handler.
+YES=""
+for arg in "$@"; do
+  [ "$arg" = "--yes" ] && YES="--yes"
+done
+
+EXT=$(printf '%s' "${FILE##*/}" | tr '[:upper:]' '[:lower:]')
+case "$EXT" in
+  *.exe|*.msi)
+    if [ -n "$YES" ]; then exec aether-exe "$FILE" --yes; else exec aether-exe "$FILE"; fi
+    ;;
+  *.dmg)
+    if [ -n "$YES" ]; then exec aether-dmg "$FILE" --yes; else exec aether-dmg "$FILE"; fi
+    ;;
+  *.apk)
+    if [ -n "$YES" ]; then exec aether-apk "$FILE" --yes; else exec aether-apk "$FILE"; fi
+    ;;
+  *.ipa)
+    if [ -n "$YES" ]; then exec aether-ipa "$FILE" --yes; else exec aether-ipa "$FILE"; fi
+    ;;
+  *.deb)
+    if [ -n "$YES" ]; then exec aether-deb "$FILE" --yes; else exec aether-deb "$FILE"; fi
+    ;;
+  *)
+    exec xdg-open "$FILE"
+    ;;
+esac

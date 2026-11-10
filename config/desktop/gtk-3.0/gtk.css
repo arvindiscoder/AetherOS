@@ -1,0 +1,154 @@
+/* AetherOS Liquid Glass — GTK 3.
+ * True backdrop blur needs compositor support; this provides the translucent
+ * surfaces, light borders, and high-contrast type that make the theme read as
+ * glass on top of the pre-blurred wallpaper.
+ */
+
+@define-color theme_bg_color rgba(16, 22, 34, 0.92);
+@define-color theme_fg_color #e9f1fb;
+@define-color theme_base_color #0f1522;
+@define-color theme_text_color #e9f1fb;
+@define-color theme_selected_bg_color #7fd4ff;
+@define-color theme_selected_fg_color #071018;
+@define-color insensitive_fg_color #6b7a90;
+@define-color borders rgba(190, 225, 255, 0.24);
+@define-color accent_color #7fd4ff;
+@define-color warning_color #ffd37f;
+@define-color error_color #ff7a90;
+@define-color success_color #8be9a8;
+
+* {
+  outline-color: alpha(@accent_color, 0.55);
+  outline-style: dashed;
+  outline-width: 1px;
+  outline-offset: -3px;
+}
+
+window,
+.background {
+  background-color: @theme_bg_color;
+  color: @theme_fg_color;
+}
+
+headerbar,
+.titlebar {
+  background-image: linear-gradient(to bottom,
+      rgba(36, 49, 74, 0.82), rgba(20, 28, 43, 0.62));
+  border-bottom: 1px solid @borders;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  min-height: 38px;
+}
+
+headerbar button,
+button {
+  background-image: none;
+  background-color: rgba(255, 255, 255, 0.10);
+  border: 1px solid @borders;
+  border-radius: 9px;
+  box-shadow: none;
+  color: @theme_fg_color;
+  padding: 5px 10px;
+}
+
+/* Keep native GTK title controls in the same red / amber / green order. */
+headerbar button.titlebutton.close { color: #ff625a; }
+headerbar button.titlebutton.minimize { color: #f6c94b; }
+headerbar button.titlebutton.maximize { color: #43c76c; }
+headerbar button.titlebutton {
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 999px;
+  padding: 2px;
+}
+headerbar button.titlebutton:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+button:hover {
+  background-color: rgba(127, 212, 255, 0.14);
+  border-color: alpha(@accent_color, 0.45);
+}
+
+button:active,
+button:checked {
+  background-color: rgba(127, 212, 255, 0.24);
+  border-color: @accent_color;
+}
+
+entry,
+spinbutton,
+combobox,
+textview text {
+  background-color: rgba(7, 11, 18, 0.58);
+  border: 1px solid @borders;
+  border-radius: 9px;
+  color: @theme_fg_color;
+  caret-color: @accent_color;
+}
+
+entry:focus,
+textview text:focus {
+  border-color: @accent_color;
+  box-shadow: 0 0 0 2px alpha(@accent_color, 0.18);
+}
+
+menu,
+popover,
+tooltip {
+  background-color: rgba(18, 24, 38, 0.82);
+  border: 1px solid @borders;
+  border-radius: 12px;
+  color: @theme_fg_color;
+}
+
+popover contents,
+menu menuitem {
+  border-radius: 10px;
+}
+
+menuitem:hover {
+  background-color: rgba(127, 212, 255, 0.18);
+}
+
+scrollbar slider {
+  background-color: alpha(@accent_color, 0.35);
+  border-radius: 8px;
+}
+
+scrollbar slider:hover {
+  background-color: alpha(@accent_color, 0.55);
+}
+
+treeview.view:selected,
+row:selected {
+  background-color: alpha(@accent_color, 0.25);
+  color: @theme_fg_color;
+}
+
+notebook > header {
+  background-color: rgba(16, 22, 34, 0.62);
+  border-bottom: 1px solid @borders;
+}
+
+notebook > header tab:checked {
+  border-bottom: 2px solid @accent_color;
+}
+
+switch {
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.10);
+}
+
+switch:checked {
+  background-color: alpha(@accent_color, 0.60);
+}
+
+progressbar trough {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+progressbar progress {
+  background-color: @accent_color;
+  border-radius: 999px;
+}

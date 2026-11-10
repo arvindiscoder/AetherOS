@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Android Package (Waydroid)
+Comment=Install and launch an APK in the Waydroid container
+Exec=aether-apk %f
+TryExec=aether-apk
+Icon=waydroid
+Terminal=false
+NoDisplay=true
+MimeType=application/vnd.android.package-archive;
+Categories=Utility;

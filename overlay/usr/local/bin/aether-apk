@@ -1,0 +1,54 @@
+#!/bin/sh
+# Install an Android APK with Waydroid and launch it in a floating window.
+set -eu
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+[ -n "$FILE" ] && [ -e "$FILE" ] || { aether_notify "Android" "No file supplied"; exit 2; }
+shift || true
+YES=""
+for arg in "$@"; do [ "$arg" = "--yes" ] && YES="--yes"; done
+
+if ! command -v waydroid >/dev/null 2>&1; then
+  if aether_confirm "Android runtime missing" \
+      "Waydroid is not installed (~1.2 GB incl. images). Install it now?"; then
+    exec foot -e sudo aether-pack install waydroid
+  fi
+  exit 127
+fi
+
+if ! lsmod 2>/dev/null | grep -q '^binder_linux'; then
+  sudo -n modprobe binder_linux devices=binder,hwbinder,vndbinder 2>/dev/null || true
+fi
+if [ ! -e /dev/binder ] && [ ! -e /dev/binderfs/binder ]; then
+  aether_notify "Waydroid: binder missing" \
+    "The running kernel has no binder_linux. Install the AetherOS custom kernel or a binder DKMS module."
+  exit 1
+fi
+
+aether_confirm "Install Android app?" \
+  "$(basename "$FILE")\n\nThis installs the APK into the Waydroid container and\nlaunches it. Android apps are not sandboxed like native apps." "$YES" || exit 0
+
+PKG=""
+if command -v aapt >/dev/null 2>&1; then
+  PKG=$(aapt dump badging "$FILE" 2>/dev/null | sed -n "s/^package: name='\([^']*\)'.*/\1/p" | head -1)
+fi
+
+if [ -n "$PKG" ]; then
+  sudo -n waydroid app install "$FILE"
+  sudo -n waydroid prop set persist.waydroid.multi_windows true >/dev/null 2>&1 || true
+  exec sudo -n waydroid app launch "$PKG"
+fi
+
+# Fallback: diff the installed-app list around the install. `comm` needs real
+# files, not shell strings.
+TMPD=$(mktemp -d "${TMPDIR:-/tmp}/aether-apk.XXXXXX")
+trap 'rm -rf "$TMPD"' EXIT INT TERM
+sudo -n waydroid app list 2>/dev/null | awk '{print $1}' | sort >"$TMPD/before" || true
+sudo -n waydroid app install "$FILE"
+sudo -n waydroid prop set persist.waydroid.multi_windows true >/dev/null 2>&1 || true
+sudo -n waydroid app list 2>/dev/null | awk '{print $1}' | sort >"$TMPD/after" || true
+PKG=$(comm -13 "$TMPD/before" "$TMPD/after" 2>/dev/null | head -1 || true)
+[ -n "$PKG" ] || PKG=$(tail -1 "$TMPD/after" 2>/dev/null || true)
+[ -n "$PKG" ] && exec sudo -n waydroid app launch "$PKG"
+aether_notify "Android" "APK installed; open it from the Waydroid app grid."

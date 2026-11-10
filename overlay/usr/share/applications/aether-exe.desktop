@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Windows Application (Wine)
+Comment=Run a Windows .exe or .msi in an isolated Wine prefix
+Exec=aether-exe %f
+TryExec=aether-exe
+Icon=wine
+Terminal=false
+NoDisplay=true
+MimeType=application/x-ms-dos-executable;application/x-msi;
+Categories=Utility;

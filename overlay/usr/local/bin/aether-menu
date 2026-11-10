@@ -1,0 +1,37 @@
+#!/bin/sh
+# AetherOS application menu (fuzzel dmenu).
+set -eu
+
+CHOICE=$(printf '%s\n' \
+  "Terminal" \
+  "Browser" \
+  "Files" \
+  "DMG Extractor" \
+  "Astra Assistant" \
+  "Install AetherOS" \
+  "Compatibility Packs" \
+  "Game Mode" \
+  "Network" \
+  "Settings / Displays" \
+  "Lock" \
+  "Suspend" \
+  "Restart" \
+  "Shut Down" |
+  fuzzel --dmenu --prompt "  Aether  " --lines 14 --width 38) || exit 0
+
+case "$CHOICE" in
+  Terminal)            exec foot ;;
+  Browser)             exec aether-browser ;;
+  Files)               exec pcmanfm ;;
+  "DMG Extractor")    exec aether-dmg ;;
+  "Astra Assistant")   exec aether-assistant ;;
+  "Install AetherOS")  exec foot -e sudo aether-install ;;
+  "Compatibility Packs") exec aether-pack-manager ;;
+  "Game Mode")         exec aether-gamemode toggle ;;
+  Network)             exec aether-network ;;
+  "Settings / Displays") exec foot -e sh -c 'wlr-randr; echo; echo "Press Enter to close"; read _' ;;
+  Lock)                exec swaylock -f -c 0f1522 ;;
+  Suspend)             exec systemctl suspend ;;
+  Restart)             exec systemctl reboot ;;
+  "Shut Down")         exec systemctl poweroff ;;
+esac

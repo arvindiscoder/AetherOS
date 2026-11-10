@@ -1,0 +1,44 @@
+#!/bin/sh
+# AetherOS browser launcher: Chromium with low-memory flags + Astra extension.
+set -eu
+
+BROWSER=${AETHER_BROWSER:-chromium}
+EXT=/usr/share/aether/astra
+
+if ! command -v "$BROWSER" >/dev/null 2>&1; then
+  notify-send -a AetherOS -u critical "Browser missing" \
+    "Install the browser package: sudo apt install chromium" 2>/dev/null || true
+  echo "aether-browser: $BROWSER not found" >&2
+  exit 127
+fi
+
+# Wayland when available, XWayland otherwise. Never force Wayland in a VM that
+# only exposes X11.
+PLATFORM="--ozone-platform=x11"
+[ -n "${WAYLAND_DISPLAY:-}" ] && PLATFORM="--ozone-platform=wayland"
+
+EXTFLAG=""
+[ -d "$EXT" ] && EXTFLAG="--load-extension=$EXT"
+
+# shellcheck disable=SC2086
+exec "$BROWSER" \
+  $PLATFORM $EXTFLAG \
+  --enable-wayland-ime \
+  --enable-low-end-device-mode \
+  --renderer-process-limit=3 \
+  --process-per-site \
+  --disk-cache-size=67108864 \
+  --media-cache-size=33554432 \
+  --disable-background-networking \
+  --disable-component-update \
+  --disable-default-apps \
+  --disable-breakpad \
+  --disable-crash-reporter \
+  --disable-domain-reliability \
+  --no-first-run \
+  --no-default-browser-check \
+  --password-store=basic \
+  --disable-sync \
+  --disable-features=Translate,OptimizationHints,MediaRouter,InterestFeedContentSuggestions \
+  --enable-features=VaapiVideoDecoder,VaapiVideoEncoder \
+  "$@"

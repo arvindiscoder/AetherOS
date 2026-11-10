@@ -1,0 +1,40 @@
+#!/bin/sh
+set -eu
+
+command -v zenity >/dev/null 2>&1 || exit 1
+ACTION=$(zenity --list \
+  --title="Control Center" \
+  --text="Quick settings" \
+  --column="Control" \
+  --width=330 --height=310 \
+  "Wi-Fi and networks" \
+  "Bluetooth power" \
+  "Display brightness" \
+  "Sound output" 2>/dev/null) || exit 0
+
+case "$ACTION" in
+  "Wi-Fi and networks")
+    aether-network
+    ;;
+  "Bluetooth power")
+    aether-bluetooth toggle
+    ;;
+  "Display brightness")
+    CURRENT=$(brightnessctl -m 2>/dev/null | cut -d, -f3 | tr -cd '0-9' || true)
+    [ -n "$CURRENT" ] || CURRENT=60
+    LEVEL=$(zenity --scale --title="Display brightness" \
+      --text="Brightness" --min-value=5 --max-value=100 \
+      --step=5 --value="$CURRENT" --width=340 2>/dev/null) || exit 0
+    brightnessctl set "${LEVEL}%" >/dev/null
+    ;;
+  "Sound output")
+    CURRENT=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null \
+      | sed -n 's/Volume: \([0-9.]*\).*/\1/p' \
+      | awk '{printf "%d", $1 * 100}' || true)
+    [ -n "$CURRENT" ] || CURRENT=50
+    LEVEL=$(zenity --scale --title="Sound output" \
+      --text="Output volume" --min-value=0 --max-value=150 \
+      --step=5 --value="$CURRENT" --width=340 2>/dev/null) || exit 0
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ "${LEVEL}%"
+    ;;
+esac

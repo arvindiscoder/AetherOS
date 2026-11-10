@@ -1,0 +1,57 @@
+#!/bin/sh
+# Inspect an iOS .ipa. Execution is deliberately not implemented: there is no
+# open-source iOS runtime, and Corellium is a commercial remote service.
+set -eu
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+[ -n "$FILE" ] && [ -e "$FILE" ] || { aether_notify "IPA" "No file supplied"; exit 2; }
+shift || true
+YES=""
+for arg in "$@"; do [ "$arg" = "--yes" ] && YES="--yes"; done
+
+aether_confirm "Inspect iOS app archive?" \
+  "$(basename "$FILE")\n\nAetherOS can unpack and describe this .ipa, but cannot\nexecute iOS apps. Continue?" "$YES" || exit 0
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/aether-ipa.XXXXXX")
+trap 'rm -rf "$TMP"' EXIT INT TERM
+unzip -q "$FILE" -d "$TMP"
+APP=$(find "$TMP/Payload" -maxdepth 1 -name '*.app' -type d 2>/dev/null | head -1)
+[ -n "$APP" ] || { aether_notify "IPA" "No Payload/*.app found"; exit 1; }
+
+python3 - "$APP" >"$TMP/report.txt" <<'PY'
+import os, plistlib, sys
+app = sys.argv[1]
+plist = os.path.join(app, "Info.plist")
+info = {}
+if os.path.exists(plist):
+    with open(plist, "rb") as fh:
+        info = plistlib.load(fh)
+print("AetherOS .ipa report")
+print("bundle:", os.path.basename(app))
+for key in ("CFBundleIdentifier", "CFBundleName", "CFBundleShortVersionString",
+            "CFBundleVersion", "MinimumOSVersion", "CFBundleExecutable",
+            "UIDeviceFamily", "CFBundleSupportedPlatforms"):
+    if key in info:
+        print(f"{key}: {info[key]}")
+exe = info.get("CFBundleExecutable")
+if exe:
+    path = os.path.join(app, exe)
+    print("executable:", path)
+    if os.path.exists(path):
+        print("size:", os.path.getsize(path), "bytes")
+print("\nCapability")
+print("  parse / inspect / extract : yes")
+print("  execute iOS app           : no")
+print("  reason                    : no open-source iOS runtime; UIKit and")
+print("                              Apple frameworks are unavailable on Linux.")
+print("  remote option             : Corellium (commercial ARM virtualization)")
+print("                              via its API, not bundled or endorsed here.")
+PY
+
+if command -v zenity >/dev/null 2>&1; then
+  zenity --text-info --title="AetherOS · iOS archive" --width=760 --height=520 \
+    --filename="$TMP/report.txt" 2>/dev/null || cat "$TMP/report.txt"
+else
+  cat "$TMP/report.txt"
+fi

@@ -1,0 +1,20 @@
+#!/bin/sh
+# AetherOS network helper. iwd is the Wi-Fi backend; systemd-networkd does DHCP.
+set -eu
+
+CHOICE=$(printf '%s\n' "Wi-Fi setup (iwctl)" "Connection status" "Open network settings" "Cancel" |
+  fuzzel --dmenu --prompt "  Network  " --lines 4 --width 34) || exit 0
+
+case "$CHOICE" in
+  "Wi-Fi setup (iwctl)")
+    exec foot -e iwctl
+    ;;
+  "Connection status")
+    exec foot -e sh -c 'ip -brief address; echo; iwctl station wlan0 show 2>/dev/null || true; echo; echo "Press Enter"; read _'
+    ;;
+  "Open network settings")
+    if command -v iwgtk >/dev/null 2>&1; then exec iwgtk; fi
+    exec foot -e iwctl
+    ;;
+  *) exit 0 ;;
+esac

@@ -1,0 +1,22 @@
+[Default Applications]
+text/html=aether-browser.desktop
+application/xhtml+xml=aether-browser.desktop
+x-scheme-handler/http=aether-browser.desktop
+x-scheme-handler/https=aether-browser.desktop
+x-scheme-handler/about=aether-browser.desktop
+x-scheme-handler/unknown=aether-browser.desktop
+inode/directory=pcmanfm.desktop
+application/x-ms-dos-executable=aether-exe.desktop
+application/x-msi=aether-exe.desktop
+application/x-apple-diskimage=aether-dmg.desktop
+application/vnd.android.package-archive=aether-apk.desktop
+application/x-ios-app=aether-ipa.desktop
+application/vnd.debian.binary-package=aether-deb.desktop
+
+[Added Associations]
+application/x-ms-dos-executable=aether-exe.desktop;
+application/x-msi=aether-exe.desktop;
+application/x-apple-diskimage=aether-dmg.desktop;
+application/vnd.android.package-archive=aether-apk.desktop;
+application/x-ios-app=aether-ipa.desktop;
+application/vnd.debian.binary-package=aether-deb.desktop;

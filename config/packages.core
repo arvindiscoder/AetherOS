@@ -1,0 +1,104 @@
+# AetherOS core package set (Debian trixie, --no-install-recommends).
+# Keep this file boring: every package here is in the ISO. Heavy runtimes
+# (Wine, Waydroid, Darling) belong in packs and must NOT be added here.
+#
+# Lines are package names, one per line. Comments and blank lines are ignored.
+
+# --- init / base integration ------------------------------------------------
+systemd-resolved
+dbus-user-session
+iwd
+systemd-zram-generator
+earlyoom
+polkitd
+
+# --- Wayland desktop (target: well under 100 MB RSS for the shell) ----------
+labwc
+waybar
+foot
+fuzzel
+mako-notifier
+swaybg
+swayidle
+swaylock
+wl-clipboard
+grim
+slurp
+wlr-randr
+xwayland
+xdg-desktop-portal
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+xdg-utils
+xdg-user-dirs
+brightnessctl
+libnotify-bin
+zenity
+
+# --- audio ------------------------------------------------------------------
+pipewire
+pipewire-pulse
+wireplumber
+alsa-utils
+# Bluetooth audio (JLab Go Pods ANC and other BT headsets): bluez provides the
+# controller daemon, libspa-0.2-bluetooth provides the PipeWire SPA plugin.
+bluez
+bluez-firmware
+libspa-0.2-bluetooth
+
+# --- graphics ---------------------------------------------------------------
+libgl1-mesa-dri
+mesa-utils
+mesa-va-drivers
+mesa-vulkan-drivers
+
+# --- browser (the single biggest core package; drop with AETHER_NO_BROWSER=1)
+chromium
+
+# --- fonts, icons, cursor ---------------------------------------------------
+fonts-dejavu-core
+fonts-liberation2
+fonts-noto-color-emoji
+adwaita-icon-theme
+hicolor-icon-theme
+librsvg2-bin
+
+# --- files, disks, network tools -------------------------------------------
+pcmanfm
+udisks2
+pciutils
+usbutils
+curl
+wget
+nano
+less
+jq
+python3
+bash-completion
+
+# --- firmware (non-free-firmware; required for real Chromebook Wi-Fi) ------
+firmware-linux-free
+firmware-iwlwifi
+firmware-atheros
+firmware-realtek
+firmware-mediatek
+firmware-brcm80211
+
+# --- compatibility helpers that are small enough for the core ---------------
+dmg2img
+7zip
+libarchive-tools
+unzip
+
+# --- MIME/desktop database tools (needed by stage 40) -----------------------
+shared-mime-info
+desktop-file-utils
+
+# --- installer --------------------------------------------------------------
+whiptail
+pv
+cryptsetup-bin
+grub2-common
+grub-efi-amd64-bin
+grub-pc-bin
+efibootmgr

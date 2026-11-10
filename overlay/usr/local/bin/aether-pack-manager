@@ -1,0 +1,15 @@
+#!/bin/sh
+# Interactive pack browser. Always runs the installer through sudo in a terminal.
+set -eu
+. /usr/local/lib/aether/common.sh
+
+CHOICE=$(aether-pack list --plain | fuzzel --dmenu --prompt "  Compatibility packs  " --lines 10 --width 42) || exit 0
+[ -n "$CHOICE" ] || exit 0
+
+if [ -e "/var/lib/aether/packs/$CHOICE" ]; then
+  aether_notify "Pack already installed" "$CHOICE is present. Reinstalling will update/repair it."
+fi
+
+aether_confirm "Install $CHOICE?" \
+  "This downloads packages and modifies the system. Continue?" || exit 0
+exec foot -e sudo aether-pack install "$CHOICE"

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="AetherOS">
+    <item label="Terminal">
+      <action name="Execute"><command>foot</command></action>
+    </item>
+    <item label="Browser">
+      <action name="Execute"><command>aether-browser</command></action>
+    </item>
+    <item label="Files">
+      <action name="Execute"><command>pcmanfm</command></action>
+    </item>
+    <item label="DMG Extractor">
+      <action name="Execute"><command>aether-dmg</command></action>
+    </item>
+    <item label="Astra Assistant">
+      <action name="Execute"><command>aether-assistant</command></action>
+    </item>
+    <separator />
+    <item label="Run…">
+      <action name="Execute"><command>fuzzel</command></action>
+    </item>
+    <item label="Install AetherOS">
+      <action name="Execute"><command>foot -e sudo aether-install</command></action>
+    </item>
+    <item label="Compatibility Packs">
+      <action name="Execute"><command>aether-pack-manager</command></action>
+    </item>
+    <separator />
+    <item label="Game Mode">
+      <action name="Execute"><command>aether-gamemode toggle</command></action>
+    </item>
+    <item label="Lock">
+      <action name="Execute"><command>swaylock -f -c 0f1522</command></action>
+    </item>
+    <item label="Power…">
+      <action name="Execute"><command>aether-power</command></action>
+    </item>
+  </menu>
+</openbox_menu>

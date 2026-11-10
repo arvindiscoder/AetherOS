@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Debian Package
+Comment=Install a .deb with apt
+Exec=aether-deb %f
+TryExec=aether-deb
+Icon=package-x-generic
+Terminal=false
+NoDisplay=true
+MimeType=application/vnd.debian.binary-package;
+Categories=System;

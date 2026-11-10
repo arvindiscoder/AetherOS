@@ -1,0 +1,74 @@
+{
+  "name": "menubar",
+  "layer": "top",
+  "position": "top",
+  "blur": true,
+  "height": 38,
+  "spacing": 6,
+  "modules-left": ["custom/menu", "wlr/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right": ["pulseaudio", "network", "custom/bluetooth", "backlight", "battery", "tray", "custom/control", "custom/power"],
+  "custom/menu": {
+    "format": "◉  AetherOS",
+    "tooltip": false,
+    "on-click": "aether-menu"
+  },
+  "wlr/workspaces": {
+    "format": "{name}",
+    "disable-scroll": true,
+    "all-outputs": true
+  },
+  "clock": {
+    "format": "{:%a  %b %d  ·  %H:%M}",
+    "format-alt": "{:%A, %B %d, %Y}",
+    "tooltip-format": "{:%A %d %B %Y}",
+    "on-click": "aether-calendar"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "Muted",
+    "format-icons": {"default": ["◖", "◖", "◖"]},
+    "on-click": "foot -e alsamixer",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+  },
+  "network": {
+    "format-wifi": "{icon} {essid}",
+    "format-ethernet": "Ethernet",
+    "format-disconnected": "Offline",
+    "format-icons": {"wifi": ["Wi-Fi", "Wi-Fi", "Wi-Fi"], "ethernet": ["Ethernet"], "disconnected": ["Offline"]},
+    "tooltip-format-wifi": "{essid} · {signalStrength}%",
+    "on-click": "aether-network"
+  },
+  "custom/bluetooth": {
+    "exec": "aether-bluetooth status",
+    "interval": 5,
+    "tooltip": false,
+    "on-click": "aether-bluetooth toggle"
+  },
+  "backlight": {
+    "format": "☼ {percent}%",
+    "tooltip": false,
+    "on-scroll-up": "brightnessctl set 5%+",
+    "on-scroll-down": "brightnessctl set 5%-"
+  },
+  "battery": {
+    "states": {"warning": 20, "critical": 10},
+    "format": "{icon} {capacity}%",
+    "format-charging": "{icon} {capacity}%",
+    "format-plugged": "{icon} {capacity}%",
+    "format-icons": ["▱", "▰", "▰", "▰", "▰"],
+    "tooltip-format": "{timeTo} · {capacity}%"
+  },
+  "tray": {"icon-size": 16, "spacing": 6},
+  "custom/control": {
+    "format": "☷",
+    "tooltip-format": "Control Center",
+    "on-click": "aether-control-center"
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "on-click": "aether-power"
+  }
+}

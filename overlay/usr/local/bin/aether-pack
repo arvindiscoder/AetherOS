@@ -1,0 +1,261 @@
+#!/bin/sh
+# AetherOS optional pack manager.
+#   aether-pack list
+#   aether-pack info NAME
+#   aether-pack install NAME [--from DIR]
+#   aether-pack installed
+set -eu
+
+. /usr/local/lib/aether/common.sh
+
+PACKS=/usr/share/aether/packs/index
+STATE=/var/lib/aether/packs
+mkdir -p "$STATE" 2>/dev/null || true
+
+usage() {
+  sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+list_packs() {
+  plain=${1:-}
+  if [ "$plain" != "--plain" ]; then
+    printf '%-14s %-10s %-10s %s\n' "NAME" "INSTALLED" "SIZE" "DESCRIPTION"
+  fi
+  while IFS='|' read -r name size desc; do
+    case "$name" in ''|'#'*) continue ;; esac
+    if [ -e "$STATE/$name" ]; then installed=yes; else installed=no; fi
+    if [ "$plain" = "--plain" ]; then
+      printf '%s\n' "$name"
+    else
+      printf '%-14s %-10s %-10s %s\n' "$name" "$installed" "$size" "$desc"
+    fi
+  done <"$PACKS"
+}
+
+install_debs() {
+  dir=$1
+  [ -d "$dir" ] || { echo "not a directory: $dir" >&2; exit 1; }
+  if ! ls "$dir"/*.deb >/dev/null 2>&1; then
+    echo "no .deb files in $dir" >&2
+    exit 1
+  fi
+  dpkg -i "$dir"/*.deb || true
+  apt-get -f install -y --no-install-recommends || true
+}
+
+install_pack() {
+  name=${1:-}
+  [ -n "$name" ] || { usage; exit 2; }
+
+  # Re-exec once, preserving the full argument vector. A function-local
+  # `need_root "$@"` would lose the original install arguments.
+  if [ "$(id -u)" != 0 ]; then
+    if sudo -n true 2>/dev/null; then
+      exec sudo -n "$0" install "$@"
+    fi
+    echo "aether-pack: root required. Run: sudo aether-pack install $*" >&2
+    exit 1
+  fi
+  shift
+
+  from=""
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --from)
+        [ "$#" -ge 2 ] || { echo "aether-pack: --from requires a directory" >&2; exit 2; }
+        from=$2
+        shift 2
+        ;;
+      --from=*) from=${1#--from=}; shift ;;
+      *) echo "unknown option: $1" >&2; exit 2 ;;
+    esac
+  done
+  if [ -n "$from" ] && [ ! -d "$from" ]; then
+    echo "aether-pack: not a directory: $from" >&2
+    exit 1
+  fi
+
+  [ -n "$from" ] && install_debs "$from"
+  apt-get update -qq || true
+
+  case "$name" in
+    wine)
+      apt-get install -y --no-install-recommends wine64 winetricks cabextract
+      /usr/local/lib/aether/packs/wine-setup
+      ;;
+    wine32)
+      dpkg --add-architecture i386
+      apt-get update -qq
+      apt-get install -y --no-install-recommends wine32:i386
+      ;;
+    waydroid)
+      if ! apt-cache show waydroid >/dev/null 2>&1; then
+        cat <<'EOF'
+The Debian archive does not provide waydroid on this release.
+Add the official repository, then re-run:
+  curl -fsSL https://repo.waydro.id | sudo sh
+  sudo apt install waydroid
+See docs/COMPATIBILITY.md for the Python 3.13 caveat.
+EOF
+        exit 1
+      fi
+      # Do not force python3-gbinder: newer Waydroid releases use a different
+      # binder stack, and an unavailable package aborts the whole transaction.
+      apt-get install -y --no-install-recommends waydroid
+      /usr/local/lib/aether/packs/waydroid-setup
+      ;;
+    media)          apt-get install -y --no-install-recommends mpv ffmpeg ;;
+    games)          apt-get install -y --no-install-recommends gamescope mangohud vulkan-tools || true ;;
+    dev)            apt-get install -y --no-install-recommends git build-essential linux-headers-amd64 ;;
+    firmware-extra) apt-get install -y --no-install-recommends firmware-misc-nonfree intel-microcode amd64-microcode || true ;;
+    voice)
+      if ! apt-get install -y --no-install-recommends whisper.cpp; then
+        cat <<'EOF'
+whisper.cpp is not packaged for this release. Build it from source:
+  sudo apt install build-essential cmake git
+  git clone https://github.com/ggerganov/whisper.cpp
+  cmake -B build -DWHISPER_BUILD_EXAMPLES=ON whisper.cpp && cmake --build build -j
+  sudo install -m755 build/bin/whisper-stream /usr/local/bin/
+  sudo install -d /usr/share/aether/models
+  # download ggml-base.en.bin into /usr/share/aether/models/
+EOF
+        exit 1
+      fi
+      ;;
+    ios-tools)      apt-get install -y --no-install-recommends libimobiledevice-utils ideviceinstaller ifuse ;;
+    darling)
+      # Darling is large and builds only on x86_64. Upstream documents a 4 GiB
+      # RAM minimum, up to 5 GiB for source and 16 GiB for the build tree, then
+      # up to 1 GiB installed. Reserve extra room for Debian build dependencies.
+      arch=$(dpkg --print-architecture)
+      [ "$arch" = amd64 ] || {
+        echo "Darling requires an x86_64/amd64 installation; this is $arch." >&2
+        exit 1
+      }
+      mem_kb=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+      [ "${mem_kb:-0}" -ge 4194304 ] || {
+        echo "Darling needs at least 4 GiB RAM to build. Increase VM memory, then retry." >&2
+        exit 1
+      }
+      free_kb=$(df -Pk / | awk 'NR==2 {print $4}')
+      [ "${free_kb:-0}" -ge 27262976 ] || {
+        echo "Darling needs at least 26 GiB free space before installing build dependencies. Expand the VDI and filesystem, then retry." >&2
+        exit 1
+      }
+
+      apt-get install -y --no-install-recommends \
+        git git-lfs cmake clang bison flex xz-utils libfuse-dev libudev-dev \
+        pkg-config libc6-dev-i386 libcap2-bin libglu1-mesa-dev libcairo2-dev \
+        libgl1-mesa-dev libtiff6-dev libfreetype6-dev libxml2-dev \
+        libegl1-mesa-dev libfontconfig1-dev libbsd-dev libxrandr-dev \
+        libxcursor-dev libgif-dev libpulse-dev libavformat-dev libavcodec-dev \
+        libswresample-dev libdbus-1-dev libxkbfile-dev libssl-dev llvm-dev \
+        libvulkan-dev libcurl4-openssl-dev libedit-dev
+
+      src=/var/tmp/aether-darling-src
+      if [ -e "$src" ]; then
+        echo "Refusing to reuse existing build directory: $src" >&2
+        exit 1
+      fi
+      mkdir -p "$src"
+      build_ok=0
+      cleanup_darling_source() {
+        if [ "$build_ok" = 1 ]; then
+          rm -rf "$src"
+        else
+          echo "Darling build failed; source and logs are retained at $src" >&2
+        fi
+      }
+      trap cleanup_darling_source EXIT HUP INT TERM
+      git lfs install --system
+      GIT_CLONE_PROTECTION_ACTIVE=false git clone --recursive --depth 1 \
+        --branch v0.1.20260608 https://github.com/darlinghq/darling.git "$src"
+      git -C "$src" submodule update --init --recursive
+      cmake -S "$src" -B "$src/build" -DCOMPONENTS=stock
+      cmake --build "$src/build" --parallel 2
+      cmake --install "$src/build"
+      darling shell uname | grep -qx Darwin || {
+        echo "Darling installed but its runtime check failed; see build output." >&2
+        exit 1
+      }
+      build_ok=1
+      ;;
+    roblox)
+      # Quadra supplies the Roblox-specific fixes needed by the Mac client.
+      # Install system dependencies as root, then keep its checkout in the
+      # invoking user's home so the launcher never runs as root.
+      target_user=${SUDO_USER:-}
+      [ -n "$target_user" ] && [ "$target_user" != root ] || {
+        echo "Run this pack from your desktop account with sudo, not from a root shell." >&2
+        exit 1
+      }
+      target_home=$(getent passwd "$target_user" | awk -F: '{print $6}')
+      [ -n "$target_home" ] && [ -d "$target_home" ] || {
+        echo "Could not find the home directory for $target_user." >&2
+        exit 1
+      }
+      quadra_dir="$target_home/.local/share/QuadraHQ"
+      if [ -e "$quadra_dir" ]; then
+        echo "Refusing to replace existing Quadra data at $quadra_dir." >&2
+        echo "Open the existing Quadra app to update it, or move that folder yourself first." >&2
+        exit 1
+      fi
+      apt-get install -y --no-install-recommends \
+        git clang lld unzip python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 \
+        gir1.2-webkit-6.0 pipewire-bin pulseaudio-utils desktop-file-utils
+      install -d -o "$target_user" -g "$(id -gn "$target_user")" \
+        "$target_home/.local/share"
+      runuser -u "$target_user" -- env HOME="$target_home" \
+        git clone --filter=blob:none --no-checkout --depth 1 --single-branch \
+        --branch v0.43.2 https://github.com/QuadraHQ/Quadra.git "$quadra_dir"
+      runuser -u "$target_user" -- env HOME="$target_home" \
+        git -C "$quadra_dir" sparse-checkout set --no-cone --stdin <<'EOF'
+/*
+!/website/
+!/.github/
+!/vercel.json
+!/.vercel/
+!/.vercelignore
+EOF
+      runuser -u "$target_user" -- env HOME="$target_home" \
+        git -C "$quadra_dir" reset --hard 43a1815a1a79c78e649ef1a66bf7f19d587bc207
+      actual_commit=$(git -C "$quadra_dir" rev-parse HEAD)
+      [ "$actual_commit" = 43a1815a1a79c78e649ef1a66bf7f19d587bc207 ] || {
+        echo "Quadra source did not match the pinned release commit; refusing to install." >&2
+        exit 1
+      }
+      runuser -u "$target_user" -- env HOME="$target_home" \
+        "$quadra_dir/launcher/install.sh"
+      cat <<'EOF'
+Quadra is installed. Open it from the app menu, choose Darling on its first-run
+screen, then let it download the current Roblox macOS Player. Roblox sign-in is
+done by you inside the client. Quadra is unofficial and not endorsed by Roblox.
+EOF
+      ;;
+    *)
+      echo "unknown pack: $name" >&2
+      list_packs
+      exit 2
+      ;;
+  esac
+
+  mkdir -p "$STATE"
+  date -u +%Y-%m-%dT%H:%M:%SZ >"$STATE/$name"
+  echo "installed: $name"
+}
+
+case "${1:-list}" in
+  list)      list_packs "${2:-}" ;;
+  installed) list_packs | awk 'NR==1 || $2=="yes"' ;;
+  info)
+    name=${2:-}; [ -n "$name" ] || { usage; exit 2; }
+    awk -F'|' -v n="$name" '$1==n {print "name: "$1"\nsize: "$2"\ndescription: "$3}' "$PACKS"
+    ;;
+  install)
+    name=${2:-}; [ -n "$name" ] || { usage; exit 2; }
+    shift 2
+    install_pack "$name" "$@"
+    ;;
+  -h|--help) usage ;;
+  *) usage; exit 2 ;;
+esac

@@ -1,0 +1,17 @@
+MOZ_ENABLE_WAYLAND=1
+QT_QPA_PLATFORM=wayland
+QT_WAYLAND_DISABLE_WINDOWDECORATION=0
+GDK_BACKEND=wayland,x11
+XDG_CURRENT_DESKTOP=labwc
+XDG_SESSION_TYPE=wayland
+XCURSOR_THEME=Adwaita
+XCURSOR_SIZE=24
+# VirtualBox's hardware cursor plane can lag behind pointer motion.
+# Force a software cursor so motion tracks the input device immediately.
+WLR_NO_HARDWARE_CURSORS=1
+# Mesa: threaded GL command submission reduces CPU stalls in games.
+mesa_glthread=true
+MESA_GLTHREAD=true
+# Wine defaults; aether-exe overrides per app.
+WINEDLLOVERRIDES=winemenubuilder.exe=d
+WINEDEBUG=-all

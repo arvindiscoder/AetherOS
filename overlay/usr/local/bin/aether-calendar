@@ -1,0 +1,7 @@
+#!/bin/sh
+# Lightweight calendar popup (zenity is already in the core image).
+set -eu
+if command -v zenity >/dev/null 2>&1; then
+  exec zenity --calendar --title="AetherOS Calendar" --text="$(date '+%A, %d %B %Y')"
+fi
+notify-send -a AetherOS "$(date '+%A, %d %B %Y')" "$(date '+%H:%M %Z')"

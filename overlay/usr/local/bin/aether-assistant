@@ -1,0 +1,67 @@
+#!/bin/sh
+# AetherOS assistant bridge (Super+Space).
+#
+# "ChatGPT Astra" has no public API. AETHER_ASSISTANT_URL is deliberately
+# configurable so you can point it at ChatGPT, a self-hosted model, or an
+# internal Astra endpoint without changing code.
+set -eu
+
+URL=${AETHER_ASSISTANT_URL:-https://chatgpt.com/}
+VOICE=0
+QUERY=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --voice) VOICE=1; shift ;;
+    --query) QUERY=${2:-}; if [ "$#" -ge 2 ]; then shift 2; else shift; fi ;;
+    --query=*) QUERY=${1#--query=}; shift ;;
+    -h|--help)
+      echo "usage: aether-assistant [--voice] [--query TEXT]"
+      exit 0
+      ;;
+    *) QUERY=$*; break ;;
+  esac
+done
+
+if [ -n "$QUERY" ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    Q=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))' "$QUERY")
+  else
+    Q=$(printf '%s' "$QUERY" | sed 's/ /%20/g')
+  fi
+  case "$URL" in
+    *\?*) URL="${URL}&q=$Q" ;;
+    *)    URL="${URL}?q=$Q" ;;
+  esac
+fi
+
+if [ "$VOICE" = 1 ]; then
+  if command -v whisper-stream >/dev/null 2>&1; then
+    exec foot -e whisper-stream --step 0 --length 8000 -m /usr/share/aether/models/ggml-base.en.bin
+  elif command -v nerd-dictation >/dev/null 2>&1; then
+    exec nerd-dictation begin
+  else
+    notify-send -a AetherOS "Voice assistant not installed" \
+      "Install the optional voice pack: sudo aether-pack install voice" 2>/dev/null || true
+    exit 0
+  fi
+fi
+
+PLATFORM=x11
+[ -n "${WAYLAND_DISPLAY:-}" ] && PLATFORM=wayland
+
+# Prefer a dedicated app window: it keeps the assistant out of the tab strip
+# and works even when Chromium's side panel was closed.
+if command -v chromium >/dev/null 2>&1; then
+  exec chromium --app="$URL" --window-size=480,820 --class=AetherAstra \
+    --ozone-platform="$PLATFORM" \
+    --enable-low-end-device-mode --password-store=basic \
+    --no-first-run --no-default-browser-check
+fi
+
+if command -v aether-browser >/dev/null 2>&1; then
+  exec aether-browser --app="$URL" --window-size=480,820
+fi
+
+echo "aether-assistant: no Chromium-compatible browser found" >&2
+exit 127

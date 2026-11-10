@@ -1,0 +1,38 @@
+#!/bin/sh
+# Initialise Waydroid with the Vanilla (no Google apps) image.
+set -eu
+[ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
+
+if ! lsmod 2>/dev/null | grep -q '^binder_linux'; then
+  modprobe binder_linux devices=binder,hwbinder,vndbinder 2>/dev/null || true
+fi
+if [ ! -e /dev/binder ] && [ ! -e /dev/binderfs/binder ]; then
+  cat >&2 <<'EOF'
+binder_linux is not available in this kernel.
+
+Waydroid needs:
+  CONFIG_ANDROID_BINDER_IPC=m
+  CONFIG_ANDROID_BINDERFS=y
+  CONFIG_PSI=y
+
+Options:
+  1. Boot the AetherOS custom kernel (build with --custom-kernel).
+  2. Install a binder DKMS module for your kernel.
+  3. On Debian, install linux-image-amd64 + a matching binder module.
+EOF
+  exit 1
+fi
+
+if [ ! -f /var/lib/waydroid/waydroid.cfg ]; then
+  waydroid init -s VANILLA
+fi
+systemctl enable --now waydroid-container.service >/dev/null 2>&1 || true
+waydroid prop set persist.waydroid.multi_windows true >/dev/null 2>&1 || true
+
+cat <<'EOF'
+Waydroid initialised. Start the session with:
+  waydroid show-full-ui
+Then launch APKs with: aether-apk file.apk
+ARM APKs require libndk/libhoudini translation, which is proprietary and is
+NOT bundled. x86_64 APKs work natively.
+EOF

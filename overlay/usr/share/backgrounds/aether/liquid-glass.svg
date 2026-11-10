@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#172d66"/>
+      <stop offset="0.36" stop-color="#32559a"/>
+      <stop offset="0.68" stop-color="#9b74b3"/>
+      <stop offset="1" stop-color="#f1a9a4"/>
+    </linearGradient>
+    <linearGradient id="blue-ribbon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b9f1ff" stop-opacity="0.75"/>
+      <stop offset="0.45" stop-color="#69b8ee" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#4a54a8" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="pink-ribbon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd2cf" stop-opacity="0.10"/>
+      <stop offset="0.5" stop-color="#ffaebd" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#ffe8d4" stop-opacity="0.68"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.22" r="0.72">
+      <stop offset="0" stop-color="#c6d9ff" stop-opacity="0.68"/>
+      <stop offset="1" stop-color="#c6d9ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+    <filter id="softer" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="115"/>
+    </filter>
+  </defs>
+
+  <rect width="2560" height="1440" fill="url(#sky)"/>
+  <rect width="2560" height="1440" fill="url(#glow)"/>
+
+  <!-- Large original glass ribbons give the desktop depth while keeping icons legible. -->
+  <g filter="url(#softer)" opacity="0.84">
+    <ellipse cx="270" cy="310" rx="550" ry="380" fill="#348ed3"/>
+    <ellipse cx="2100" cy="260" rx="650" ry="420" fill="#edc4ed"/>
+    <ellipse cx="1360" cy="1170" rx="1050" ry="360" fill="#111c57"/>
+    <ellipse cx="2280" cy="1100" rx="650" ry="430" fill="#f5a3a1"/>
+  </g>
+
+  <path d="M-180 900 C260 600 650 560 980 730 C1330 910 1460 1180 1880 1100 C2210 1035 2410 760 2760 720 L2760 1560 L-180 1560 Z"
+        fill="url(#blue-ribbon)"/>
+  <path d="M-180 1120 C220 880 580 820 910 920 C1250 1020 1470 1300 1870 1280 C2200 1265 2430 1020 2760 900 L2760 1560 L-180 1560 Z"
+        fill="#17265e" fill-opacity="0.62"/>
+  <path d="M-200 1220 C200 1050 600 1010 980 1110 C1390 1220 1570 1410 1970 1390 C2310 1370 2480 1170 2760 1080 L2760 1560 L-200 1560 Z"
+        fill="url(#pink-ribbon)"/>
+  <path d="M-160 930 C250 650 640 620 970 785 C1320 960 1510 1210 1870 1140 C2220 1070 2430 820 2730 760"
+        fill="none" stroke="#e0f6ff" stroke-opacity="0.33" stroke-width="3"/>
+  <path d="M-160 1130 C220 900 590 860 920 960 C1300 1080 1510 1330 1880 1310 C2210 1290 2440 1060 2730 930"
+        fill="none" stroke="#ffe6ed" stroke-opacity="0.24" stroke-width="2"/>
+
+  <g opacity="0.12" fill="#fff" font-family="DejaVu Sans, sans-serif">
+    <text x="105" y="1330" font-size="38" font-weight="bold" letter-spacing="16">AETHEROS</text>
+    <text x="109" y="1372" font-size="16" letter-spacing="6">NIMBUS · A CALMER DESKTOP</text>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+#!/bin/sh
+# AetherOS power menu.
+set -eu
+
+CHOICE=$(printf '%s\n' "Lock" "Suspend" "Restart" "Shut Down" "Cancel" |
+  fuzzel --dmenu --prompt "  Power  " --lines 5 --width 28) || exit 0
+
+case "$CHOICE" in
+  Lock)      exec swaylock -f -c 0f1522 ;;
+  Suspend)   exec systemctl suspend ;;
+  Restart)   exec systemctl reboot ;;
+  "Shut Down") exec systemctl poweroff ;;
+  *)         exit 0 ;;
+esac

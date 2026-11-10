@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Install Roblox (Mac client)
+Comment=Install Quadra to run the Roblox macOS Player through Darling
+Exec=foot -e sudo aether-pack install roblox
+Icon=applications-games
+Terminal=false
+Categories=Game;Utility;
+StartupNotify=true

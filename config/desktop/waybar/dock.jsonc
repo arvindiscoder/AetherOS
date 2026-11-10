@@ -1,0 +1,51 @@
+{
+  "name": "dock",
+  "layer": "top",
+  "position": "bottom",
+  "blur": true,
+  "height": 72,
+  "margin-bottom": 12,
+  "spacing": 5,
+  "modules-center": [
+    "custom/launcher",
+    "custom/files",
+    "custom/browser",
+    "custom/terminal",
+    "custom/astra",
+    "wlr/taskbar"
+  ],
+  "custom/launcher": {
+    "format": "▦",
+    "tooltip-format": "Applications",
+    "on-click": "fuzzel"
+  },
+  "custom/files": {
+    "format": "📁",
+    "tooltip-format": "Files",
+    "on-click": "pcmanfm"
+  },
+  "custom/browser": {
+    "format": "🌐",
+    "tooltip-format": "Aether Browser",
+    "on-click": "aether-browser"
+  },
+  "custom/terminal": {
+    "format": "▣",
+    "tooltip-format": "Terminal",
+    "on-click": "foot"
+  },
+  "custom/astra": {
+    "format": "✦",
+    "tooltip-format": "Astra Assistant",
+    "on-click": "aether-assistant"
+  },
+  "wlr/taskbar": {
+    "format": "{icon}",
+    "icon-size": 36,
+    "icon-theme": "Adwaita",
+    "tooltip-format": "{title}",
+    "on-click": "activate",
+    "on-click-middle": "close",
+    "all-outputs": true
+  }
+}

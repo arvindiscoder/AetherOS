@@ -1,0 +1,22 @@
+#!/bin/sh
+# Prepare a shared 64-bit Wine prefix for the aether user.
+set -eu
+[ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
+
+PREFIX=/home/aether/.wine-aether
+install -d -m 0755 -o aether -g aether "$PREFIX"
+
+W=""
+for c in wine64 wine; do command -v "$c" >/dev/null 2>&1 && { W=$c; break; }; done
+[ -n "$W" ] || { echo "wine not found after install" >&2; exit 1; }
+
+runuser -u aether -- env HOME=/home/aether WINEPREFIX="$PREFIX" WINEARCH=win64 \
+  WINEDEBUG=-all WINEDLLOVERRIDES="winemenubuilder.exe=d;mscoree,mshtml=" \
+  "$W" wineboot -u >/dev/null 2>&1 || true
+
+if [ -f /usr/share/aether/wine/aether.reg ]; then
+  runuser -u aether -- env HOME=/home/aether WINEPREFIX="$PREFIX" WINEDEBUG=-all \
+    "$W" regedit /S /usr/share/aether/wine/aether.reg >/dev/null 2>&1 || true
+fi
+
+echo "Wine prefix ready: $PREFIX"

@@ -1,0 +1,62 @@
+/* AetherOS Liquid Glass — GTK 4. Keep selectors conservative; GTK4 drops
+ * several GTK3 properties rather than warning at runtime. */
+
+@define-color theme_bg_color rgba(16, 22, 34, 0.72);
+@define-color theme_fg_color #e9f1fb;
+@define-color accent_bg_color #7fd4ff;
+@define-color accent_fg_color #071018;
+@define-color window_bg_color rgba(15, 21, 34, 0.72);
+@define-color window_fg_color #e9f1fb;
+@define-color view_bg_color #0b111c;
+@define-color view_fg_color #e9f1fb;
+@define-color headerbar_bg_color rgba(20, 28, 43, 0.72);
+@define-color headerbar_fg_color #e9f1fb;
+@define-color card_bg_color rgba(36, 49, 74, 0.58);
+@define-color borders rgba(190, 225, 255, 0.24);
+
+window {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+headerbar {
+  background-color: @headerbar_bg_color;
+  border-bottom: none;
+  min-height: 38px;
+}
+
+headerbar button.close { color: #ff625a; }
+headerbar button.minimize { color: #f6c94b; }
+headerbar button.maximize { color: #43c76c; }
+
+button {
+  background-color: rgba(255, 255, 255, 0.10);
+  border: 1px solid @borders;
+  border-radius: 9px;
+  color: @window_fg_color;
+  padding: 5px 10px;
+}
+
+button:hover {
+  background-color: rgba(127, 212, 255, 0.14);
+  border-color: alpha(@accent_bg_color, 0.45);
+}
+
+entry,
+textview {
+  background-color: rgba(7, 11, 18, 0.58);
+  border: 1px solid @borders;
+  border-radius: 9px;
+  color: @window_fg_color;
+}
+
+popover,
+menu {
+  background-color: rgba(18, 24, 38, 0.82);
+  border: 1px solid @borders;
+  border-radius: 12px;
+}
+
+row:selected {
+  background-color: alpha(@accent_bg_color, 0.24);
+}

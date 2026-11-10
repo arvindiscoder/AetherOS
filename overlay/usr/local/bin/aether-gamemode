@@ -1,0 +1,100 @@
+#!/bin/sh
+# AetherOS Game Mode: performance governor + platform profile + state flag.
+# Usage: aether-gamemode on|off|toggle|status
+set -eu
+
+STATE=/run/aether/gamemode
+PREV=/run/aether/gamemode.prev
+mkdir -p /run/aether
+
+is_root() { [ "$(id -u)" = 0 ]; }
+
+apply_on() {
+  : >"$PREV"
+  for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+    [ -w "$g" ] || continue
+    printf '%s\n' "$(cat "$g")" >>"$PREV"
+    printf 'performance\n' >"$g" 2>/dev/null || true
+  done
+  for p in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+    [ -w "$p" ] && printf 'performance\n' >"$p" 2>/dev/null || true
+  done
+  for p in /sys/firmware/acpi/platform_profile; do
+    [ -w "$p" ] && printf 'performance\n' >"$p" 2>/dev/null || true
+  done
+  for d in /sys/class/drm/card*/device/power_dpm_force_performance_level; do
+    [ -w "$d" ] && printf 'high\n' >"$d" 2>/dev/null || true
+  done
+  # Keep the desktop from swapping under a game.
+  sysctl -q -w vm.swappiness=100 >/dev/null 2>&1 || true
+  touch "$STATE"
+}
+
+apply_off() {
+  if [ -s "$PREV" ]; then
+    i=0
+    for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+      [ -w "$g" ] || continue
+      i=$((i + 1))
+      gov=$(sed -n "${i}p" "$PREV")
+      [ -n "$gov" ] && printf '%s\n' "$gov" >"$g" 2>/dev/null || true
+    done
+  else
+    for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+      [ -w "$g" ] && printf 'schedutil\n' >"$g" 2>/dev/null || true
+    done
+  fi
+  for p in /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference; do
+    [ -w "$p" ] && printf 'balance_performance\n' >"$p" 2>/dev/null || true
+  done
+  for p in /sys/firmware/acpi/platform_profile; do
+    [ -w "$p" ] && printf 'balanced\n' >"$p" 2>/dev/null || true
+  done
+  for d in /sys/class/drm/card*/device/power_dpm_force_performance_level; do
+    [ -w "$d" ] && printf 'auto\n' >"$d" 2>/dev/null || true
+  done
+  sysctl -q -w vm.swappiness=180 >/dev/null 2>&1 || true
+  rm -f "$STATE" "$PREV"
+}
+
+root_action() {
+  case "${1:-status}" in
+    on)     apply_on ;;
+    off)    apply_off ;;
+    toggle) if [ -e "$STATE" ]; then apply_off; else apply_on; fi ;;
+    status) [ -e "$STATE" ] && echo GAME ;;
+    *) echo "usage: aether-gamemode on|off|toggle|status" >&2; exit 2 ;;
+  esac
+}
+
+if is_root; then
+  root_action "$@"
+  exit 0
+fi
+
+case "${1:-toggle}" in
+  status)
+    [ -e "$STATE" ] && echo GAME
+    exit 0
+    ;;
+  on|off|toggle) ;;
+  *) echo "usage: aether-gamemode on|off|toggle|status" >&2; exit 2 ;;
+esac
+
+if sudo -n true 2>/dev/null; then
+  sudo -n /usr/local/bin/aether-gamemode "$@"
+elif command -v pkexec >/dev/null 2>&1; then
+  pkexec /usr/local/bin/aether-gamemode "$@"
+else
+  notify-send -a AetherOS -u critical "Game Mode needs root" \
+    "Run: sudo aether-gamemode $1" 2>/dev/null || true
+  exit 1
+fi
+
+# The helper already applied the change; report as the user.
+if [ -e "$STATE" ]; then
+  notify-send -a AetherOS "Game Mode on" \
+    "Performance governor, tearing allowed in fullscreen, ZRAM tuned." 2>/dev/null || true
+else
+  notify-send -a AetherOS "Game Mode off" "Balanced power settings restored." 2>/dev/null || true
+fi

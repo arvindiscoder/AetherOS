@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=iOS App Archive
+Comment=Inspect an .ipa (execution is not supported)
+Exec=aether-ipa %f
+TryExec=aether-ipa
+Icon=application-x-archive
+Terminal=false
+NoDisplay=true
+MimeType=application/x-ios-app;
+Categories=Utility;

@@ -1,0 +1,15 @@
+#!/bin/sh
+# Install a Debian package with apt (dependency resolution preserved).
+set -eu
+. /usr/local/lib/aether/common.sh
+
+FILE=${1:-}
+[ -n "$FILE" ] && [ -e "$FILE" ] || { aether_notify "Debian package" "No file supplied"; exit 2; }
+shift || true
+YES=""
+for arg in "$@"; do [ "$arg" = "--yes" ] && YES="--yes"; done
+
+aether_confirm "Install Debian package?" \
+  "$(basename "$FILE")\n\napt will resolve dependencies. Packages run with full\nsystem privileges during installation." "$YES" || exit 0
+
+exec foot -e sudo apt-get install -y "$FILE"

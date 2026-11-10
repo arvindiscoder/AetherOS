@@ -1,0 +1,47 @@
+#!/bin/sh
+# labwc session autostart. Keep this list short; every process costs RAM.
+
+# Wallpaper first, so panels have something to blur/contrast against.
+# PNG is generated at build time; SVG is the fallback.
+BG=/usr/share/backgrounds/aether/liquid-glass.png
+[ -f "$BG" ] || BG=/usr/share/backgrounds/aether/liquid-glass.svg
+swaybg -i "$BG" -m fill >/dev/null 2>&1 &
+
+# macOS-inspired menu bar and floating app dock.
+mkdir -p "$HOME/.local/state/aether"
+waybar -c /etc/xdg/waybar/config.jsonc -s /etc/xdg/waybar/style.css \
+  >"$HOME/.local/state/aether/waybar-menu.log" 2>&1 &
+# Give the compositor a moment to advertise layer-shell before starting the
+# second panel, then surface any startup failure instead of hiding it.
+sleep 2
+if ! pgrep -u "$(id -u)" -x waybar >/dev/null 2>&1; then
+  notify-send -u critical "AetherOS menu bar did not start" \
+    "$(tail -n 5 "$HOME/.local/state/aether/waybar-menu.log")" || true
+fi
+waybar -c /etc/xdg/waybar/dock.jsonc -s /etc/xdg/waybar/style.css \
+  >"$HOME/.local/state/aether/waybar-dock.log" 2>&1 &
+mako >/dev/null 2>&1 &
+
+# Portal backend for file choosers/screen sharing.
+/usr/libexec/xdg-desktop-portal-wlr >/dev/null 2>&1 &
+/usr/libexec/xdg-desktop-portal >/dev/null 2>&1 &
+
+# Idle policy: dim at 4 min, lock at 8 min, suspend at 20 min on battery.
+swayidle -w \
+  timeout 240 'brightnessctl set 40%' \
+  timeout 480 'swaylock -f -c 0f1522' \
+  timeout 1200 'systemctl suspend' \
+  before-sleep 'swaylock -f -c 0f1522' >/dev/null 2>&1 &
+
+# Apply the session environment to systemd user services (PipeWire etc.).
+if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+  dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+fi
+
+# First-run hint, once.
+if [ ! -e "$HOME/.config/aether/welcome-shown" ]; then
+  mkdir -p "$HOME/.config/aether"
+  notify-send -a AetherOS -i dialog-information \
+    "Welcome to AetherOS" "Super+D launcher · Super+Space Astra · Super+Return terminal" || true
+  touch "$HOME/.config/aether/welcome-shown"
+fi

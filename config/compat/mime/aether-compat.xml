@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-ms-dos-executable">
+    <comment>Windows executable</comment>
+    <glob pattern="*.exe"/>
+    <glob pattern="*.EXE"/>
+    <magic priority="60"><match value="MZ" type="string" offset="0"/></magic>
+  </mime-type>
+
+  <mime-type type="application/x-msi">
+    <comment>Windows Installer package</comment>
+    <glob pattern="*.msi"/>
+    <glob pattern="*.MSI"/>
+  </mime-type>
+
+  <mime-type type="application/x-apple-diskimage">
+    <comment>Apple disk image</comment>
+    <glob pattern="*.dmg"/>
+    <glob pattern="*.DMG"/>
+  </mime-type>
+
+  <mime-type type="application/vnd.android.package-archive">
+    <comment>Android package</comment>
+    <glob pattern="*.apk"/>
+    <glob pattern="*.APK"/>
+  </mime-type>
+
+  <mime-type type="application/x-ios-app">
+    <comment>iOS application archive</comment>
+    <glob pattern="*.ipa"/>
+    <glob pattern="*.IPA"/>
+  </mime-type>
+</mime-info>

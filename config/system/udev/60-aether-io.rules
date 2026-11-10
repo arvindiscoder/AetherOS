@@ -1,0 +1,7 @@
+# I/O schedulers for the storage AetherOS actually runs on.
+# eMMC: BFQ for interactive responsiveness. NVMe: none. USB/SATA: mq-deadline.
+ACTION=="add|change", KERNEL=="mmcblk[0-9]", ATTR{queue/rotational}="0", ATTR{queue/scheduler}="bfq", ATTR{queue/read_ahead_kb}="128"
+ACTION=="add|change", KERNEL=="mmcblk[0-9]", ATTR{queue/iosched/low_latency}="1"
+ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]", ATTR{queue/rotational}="0", ATTR{queue/scheduler}="none", ATTR{queue/read_ahead_kb}="128"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}="0", ATTR{queue/scheduler}="mq-deadline", ATTR{queue/read_ahead_kb}="128"
+ACTION=="add|change", KERNEL=="vd[a-z]", ATTR{queue/rotational}="0", ATTR{queue/scheduler}="mq-deadline", ATTR{queue/read_ahead_kb}="128"

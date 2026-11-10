@@ -1,0 +1,56 @@
+# AetherOS "Liquid Glass" Openbox/labwc theme.
+# Colors are deliberately high-contrast; the glass effect comes from the
+# translucent panel clients (Waybar/foot) and the pre-blurred wallpaper.
+
+border.width: 1
+padding.width: 6
+padding.height: 6
+window.handle.width: 0
+window.client.padding.width: 0
+
+window.active.title.bg: flat solid
+window.active.title.bg.color: #1a2233
+window.active.label.text.color: #eaf2ff
+window.active.border.color: #7fd4ff
+window.active.button.unpressed.image.color: #eaf2ff
+window.active.button.hover.image.color: #7fd4ff
+window.active.button.pressed.image.color: #7fd4ff
+window.active.button.close.unpressed.image.color: #ff625a
+window.active.button.close.hover.image.color: #ff8b83
+window.active.button.iconify.unpressed.image.color: #f6c94b
+window.active.button.iconify.hover.image.color: #ffdf78
+window.active.button.max.unpressed.image.color: #43c76c
+window.active.button.max.hover.image.color: #72e391
+
+window.inactive.title.bg: flat solid
+window.inactive.title.bg.color: #141a26
+window.inactive.label.text.color: #9fb0c8
+window.inactive.border.color: #2c3a52
+window.inactive.button.unpressed.image.color: #9fb0c8
+window.inactive.button.close.unpressed.image.color: #b84a45
+window.inactive.button.iconify.unpressed.image.color: #b49237
+window.inactive.button.max.unpressed.image.color: #368b4f
+
+window.button.width: 18
+window.button.height: 18
+window.button.spacing: 4
+window.button.hover.bg.corner-radius: 9
+
+menu.bg: flat solid
+menu.bg.color: #121826
+menu.border.color: #3a4a66
+menu.text.color: #eaf2ff
+menu.active.bg: flat solid
+menu.active.bg.color: #24314a
+menu.active.text.color: #ffffff
+menu.disabled.text.color: #6b7a90
+
+osd.bg: flat solid
+osd.bg.color: #121826
+osd.text.color: #eaf2ff
+osd.border.color: #7fd4ff
+
+window.active.shadow.size: 26
+window.active.shadow.color: #000000
+window.inactive.shadow.size: 16
+window.inactive.shadow.color: #000000

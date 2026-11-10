@@ -1,0 +1,8 @@
+# AetherOS build artifacts
+build/
+out/*.iso
+out/*.sha256
+out/*.manifest.txt
+*.log
+*.tmp
+.DS_Store

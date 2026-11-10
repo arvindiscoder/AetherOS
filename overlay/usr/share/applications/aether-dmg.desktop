@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=DMG Extractor
+Comment=Extract files from a .dmg; optionally try a Mac app with Darling
+Exec=aether-dmg %f
+TryExec=aether-dmg
+Icon=application-x-cd-image
+Terminal=false
+MimeType=application/x-apple-diskimage;
+Categories=Utility;

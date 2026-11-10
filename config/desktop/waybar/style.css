@@ -1,0 +1,162 @@
+/* AetherOS desktop inspired by contemporary macOS: restrained top bar and a
+ * single floating dock. Waybar itself has no backdrop blur under labwc, so
+ * the translucent material is layered over the blurred abstract wallpaper. */
+@define-color glass rgba(20, 26, 42, 0.72);
+@define-color glass-dock rgba(18, 24, 40, 0.66);
+@define-color border rgba(224, 238, 255, 0.23);
+@define-color text #f5f7ff;
+@define-color muted #bdc8dc;
+@define-color blue #9edaff;
+@define-color coral #ffb7c9;
+
+* {
+  border: none;
+  border-radius: 0;
+  font-family: "DejaVu Sans", "Noto Color Emoji", sans-serif;
+  font-size: 12px;
+  min-height: 0;
+}
+
+window#waybar {
+  background: transparent;
+  color: @text;
+}
+
+window#waybar.menubar {
+  background: @glass;
+  border-bottom: 1px solid @border;
+}
+
+window#waybar.menubar .modules-left,
+window#waybar.menubar .modules-center,
+window#waybar.menubar .modules-right {
+  background: transparent;
+  padding: 0 10px;
+}
+
+#custom-menu {
+  color: @text;
+  font-weight: 700;
+  padding: 0 12px 0 7px;
+}
+
+#workspaces button {
+  color: @muted;
+  background: transparent;
+  padding: 0 9px;
+  border-radius: 10px;
+}
+
+#workspaces button.active {
+  color: @text;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#workspaces button:hover,
+#pulseaudio:hover,
+#network:hover,
+#custom-power:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#clock {
+  color: @text;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+#pulseaudio,
+#network,
+#battery,
+#tray,
+#custom-power {
+  color: @text;
+  padding: 0 8px;
+  border-radius: 10px;
+}
+
+#battery.warning { color: #ffe1a1; }
+#battery.critical { color: @coral; }
+
+window#waybar.dock .modules-center {
+  background: @glass-dock;
+  border: 1px solid @border;
+  border-radius: 25px;
+  padding: 5px 10px;
+  box-shadow: 0 10px 34px rgba(5, 9, 19, 0.42),
+              inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+window#waybar.dock button {
+  background: transparent;
+  color: @text;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  font-size: 29px;
+}
+
+window#waybar.dock button:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.20);
+  font-size: 32px;
+}
+
+window#waybar.dock #custom-launcher,
+window#waybar.dock #custom-files,
+window#waybar.dock #custom-browser,
+window#waybar.dock #custom-terminal,
+window#waybar.dock #custom-astra {
+  font-size: 32px;
+  min-width: 50px;
+  min-height: 52px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+}
+
+window#waybar.dock #custom-launcher { color: #b8d8ff; }
+window#waybar.dock #custom-files { color: #ffd887; }
+window#waybar.dock #custom-browser { color: #9ee7ff; }
+window#waybar.dock #custom-terminal { color: #d6cdfc; }
+window#waybar.dock #custom-astra { color: #ffd0df; }
+
+window#waybar.dock #custom-launcher:hover,
+window#waybar.dock #custom-files:hover,
+window#waybar.dock #custom-browser:hover,
+window#waybar.dock #custom-terminal:hover,
+window#waybar.dock #custom-astra:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.20);
+  font-size: 36px;
+}
+
+window#waybar.dock #taskbar {
+  background: transparent;
+  padding-left: 8px;
+  margin-left: 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+window#waybar.dock #taskbar button {
+  min-width: 42px;
+  min-height: 42px;
+  padding: 2px;
+  margin: 0 2px;
+}
+
+window#waybar.dock #taskbar button.active {
+  background: rgba(158, 218, 255, 0.20);
+  border-color: rgba(158, 218, 255, 0.44);
+}
+
+tooltip {
+  background: rgba(22, 28, 44, 0.96);
+  border: 1px solid @border;
+  border-radius: 10px;
+  color: @text;
+}
+
+tooltip label { padding: 4px; }

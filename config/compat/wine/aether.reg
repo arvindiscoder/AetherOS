@@ -1,0 +1,33 @@
+Windows Registry Editor Version 5.00
+
+; AetherOS Wine defaults: low-overhead, no Mono/Gecko prompts, GL renderer
+; first (better on old Intel iGPUs than Vulkan/DXVK), windowed-friendly.
+[HKEY_CURRENT_USER\Software\Wine\Direct3D]
+"renderer"="gl"
+"csmt"=dword:00000001
+"VideoMemorySize"="512"
+"MaxVersionGL"=dword:00030002
+
+[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
+"Decorated"="Y"
+"Managed"="Y"
+"GrabFullscreen"="Y"
+"GrabPointer"="Y"
+
+[HKEY_CURRENT_USER\Software\Wine\DllOverrides]
+"mscoree"=""
+"mshtml"=""
+"winemenubuilder.exe"=""
+
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"FontSmoothing"="2"
+"FontSmoothingType"=dword:00000002
+"FontSmoothingGamma"=dword:00000578
+"FontSmoothingOrientation"=dword:00000001
+
+[HKEY_CURRENT_USER\Control Panel\Mouse]
+"MouseSensitivity"="10"
+"MouseSpeed"="1"
+
+[HKEY_CURRENT_USER\Software\Wine\Explorer\Desktops]
+"Default"=dword:00000000

@@ -1,0 +1,4 @@
+# Kill the biggest memory hog before the kernel livelocks.
+# -m 4: minimum 4% free RAM; -s 4: minimum 4% free swap.
+# Keep the compositor and session plumbing alive; prefer browsers/Wine/Android.
+EARLYOOM_ARGS="-r 60 -m 4 -s 4 --avoid '^(systemd|systemd-journal|systemd-logind|labwc|waybar|pipewire|pipewire-pulse|wireplumber|Xwayland|dbus-daemon|dbus-broker)$' --prefer '^(chrome|chromium|wine|wineserver|waydroid|java|electron)$'"

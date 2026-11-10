@@ -1,0 +1,157 @@
+# AetherOS custom kernel fragment.
+#
+# This is merged over the Debian amd64 config with scripts/kconfig/merge_config.sh.
+# It is intentionally conservative: no out-of-tree RT patch, no vendor kernel.
+# The goal is low latency + the modules Waydroid/VirtualBox/Chromebooks need,
+# not a smaller-than-Debian kernel (that is a separate, riskier exercise).
+#
+# Build with: sudo ./build.sh --custom-kernel
+# Debian's stock kernel already supports PREEMPT_DYNAMIC; `preempt=full` on the
+# command line activates it without compiling anything.
+
+# --- latency / scheduling ---------------------------------------------------
+CONFIG_PREEMPT=y
+CONFIG_PREEMPT_DYNAMIC=y
+CONFIG_PREEMPT_VOLUNTARY=y
+CONFIG_HZ_1000=y
+CONFIG_HZ=1000
+CONFIG_NO_HZ_IDLE=y
+CONFIG_SCHED_CORE=y
+CONFIG_SCHED_AUTOGROUP=y
+CONFIG_HIGH_RES_TIMERS=y
+CONFIG_PSI=y
+
+# --- memory compression -----------------------------------------------------
+CONFIG_ZRAM=m
+CONFIG_ZRAM_DEF_COMP_ZSTD=y
+CONFIG_ZSMALLOC=y
+CONFIG_ZSTD_COMPRESS=y
+CONFIG_ZSTD_DECOMPRESS=y
+CONFIG_CRYPTO_ZSTD=y
+CONFIG_TRANSPARENT_HUGEPAGE=y
+CONFIG_TRANSPARENT_HUGEPAGE_MADVISE=y
+CONFIG_COMPACTION=y
+
+# --- filesystems / live boot ------------------------------------------------
+CONFIG_SQUASHFS=y
+CONFIG_SQUASHFS_ZSTD=y
+CONFIG_SQUASHFS_XZ=y
+CONFIG_OVERLAY_FS=y
+CONFIG_EXT4_FS=y
+CONFIG_EXT4_FS_POSIX_ACL=y
+CONFIG_F2FS_FS=y
+CONFIG_VFAT_FS=y
+CONFIG_EXFAT_FS=m
+CONFIG_NTFS3_FS=m
+CONFIG_ISO9660_FS=y
+CONFIG_UDF_FS=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+
+# --- Android / Waydroid -----------------------------------------------------
+CONFIG_ANDROID_BINDER_IPC=m
+CONFIG_ANDROID_BINDERFS=y
+CONFIG_ASHMEM=y
+CONFIG_PSI_DEFAULT_DISABLED=n
+CONFIG_BRIDGE=m
+CONFIG_VETH=m
+CONFIG_NF_TABLES=m
+CONFIG_NFT_NAT=m
+CONFIG_NETFILTER_XT_TARGET_MASQUERADE=m
+CONFIG_NETFILTER_XT_MATCH_COMMENT=m
+CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=m
+
+# --- VirtualBox / VMware / QEMU ---------------------------------------------
+CONFIG_DRM_VMWGFX=m
+CONFIG_DRM_VBOXVIDEO=m
+CONFIG_DRM_QXL=m
+CONFIG_DRM_BOCHS=m
+CONFIG_DRM_VIRTIO_GPU=m
+CONFIG_VIRTIO_BLK=m
+CONFIG_VIRTIO_SCSI=m
+CONFIG_VIRTIO_NET=m
+CONFIG_VIRTIO_PCI=m
+CONFIG_VIRTIO_CONSOLE=m
+CONFIG_VBOXGUEST=m
+CONFIG_SND_HDA_INTEL=m
+
+# --- Chromebook storage / input / Wi-Fi ------------------------------------
+CONFIG_MMC=y
+CONFIG_MMC_BLOCK=y
+CONFIG_MMC_SDHCI=y
+CONFIG_MMC_SDHCI_PCI=y
+CONFIG_MMC_SDHCI_ACPI=y
+CONFIG_NVME_CORE=y
+CONFIG_BLK_DEV_NVME=y
+CONFIG_ATA=y
+CONFIG_SATA_AHCI=y
+CONFIG_USB_STORAGE=y
+CONFIG_USB_XHCI_HCD=y
+CONFIG_USB_EHCI_HCD=y
+CONFIG_HID_GENERIC=y
+CONFIG_USB_HID=y
+CONFIG_I2C_HID=y
+CONFIG_I2C_HID_ACPI=y
+CONFIG_HID_MULTITOUCH=y
+CONFIG_IWLWIFI=m
+CONFIG_IWLMVM=m
+CONFIG_ATH10K=m
+CONFIG_ATH10K_PCI=m
+CONFIG_RTW88=m
+CONFIG_RTW89=m
+CONFIG_MT76_CORE=m
+CONFIG_MT7921E=m
+CONFIG_BRCMFMAC=m
+
+# --- graphics / audio -------------------------------------------------------
+CONFIG_DRM=y
+CONFIG_DRM_KMS_HELPER=y
+CONFIG_DRM_FBDEV_EMULATION=y
+CONFIG_FB=y
+CONFIG_FRAMEBUFFER_CONSOLE=y
+CONFIG_VT=y
+CONFIG_VT_CONSOLE=y
+CONFIG_SND=y
+CONFIG_SND_HDA_CODEC_HDMI=m
+CONFIG_SND_SOC=m
+CONFIG_SND_SOC_SOF_PCI=m
+CONFIG_SND_SOC_SOF_ACPI=m
+
+# --- networking -------------------------------------------------------------
+CONFIG_PACKET=y
+CONFIG_UNIX=y
+CONFIG_INET=y
+CONFIG_IPV6=y
+CONFIG_TCP_CONG_BBR=y
+CONFIG_NET_SCH_FQ=y
+CONFIG_NET_SCH_FQ_CODEL=y
+CONFIG_WIREGUARD=m
+
+# --- I/O schedulers ---------------------------------------------------------
+CONFIG_IOSCHED_BFQ=y
+CONFIG_BFQ_GROUP_IOSCHED=y
+CONFIG_MQ_IOSCHED_DEADLINE=y
+CONFIG_MQ_IOSCHED_KYBER=y
+
+# --- module handling --------------------------------------------------------
+CONFIG_MODULES=y
+CONFIG_MODULE_UNLOAD=y
+CONFIG_MODULE_COMPRESS=y
+CONFIG_MODULE_COMPRESS_ZSTD=y
+CONFIG_EFI=y
+CONFIG_EFI_STUB=y
+CONFIG_FB_EFI=y
+CONFIG_SECCOMP=y
+CONFIG_USER_NS=y
+CONFIG_CGROUPS=y
+CONFIG_MEMCG=y
+CONFIG_BLK_CGROUP=y
+CONFIG_NAMESPACES=y
+CONFIG_NET_NS=y
+CONFIG_PID_NS=y
+
+# --- debug / size -----------------------------------------------------------
+CONFIG_DEBUG_INFO_NONE=y
+CONFIG_DEBUG_KERNEL=n
+CONFIG_IKCONFIG=m
+CONFIG_IKCONFIG_PROC=y

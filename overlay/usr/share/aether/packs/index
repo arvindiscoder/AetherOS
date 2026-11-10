@@ -1,0 +1,13 @@
+# AetherOS optional packs. name|size|description
+# The core ISO contains NONE of these. Install online or from local .debs.
+wine|~450 MB|Wine 64-bit + winetricks for .exe/.msi
+wine32|~700 MB|32-bit Wine (adds i386 multiarch; large)
+waydroid|~1.2 GB|Waydroid Android container + Vanilla image
+media|~120 MB|mpv, ffmpeg, codecs for local media
+games|~250 MB|gamescope, MangoHud, Vulkan tools
+dev|~500 MB|git, build-essential, headers (for Darling/whisper builds)
+firmware-extra|~120 MB|extra non-free firmware + CPU microcode
+voice|~200 MB|whisper.cpp model for Super+Shift+Space dictation
+ios-tools|~40 MB|libimobiledevice tools for real iOS devices (not .ipa execution)
+darling|~1 GB installed|Experimental macOS CLI and limited Cocoa GUI compatibility (large source build)
+roblox|varies|Quadra launcher for Roblox macOS Player through Darling; downloads client on first launch

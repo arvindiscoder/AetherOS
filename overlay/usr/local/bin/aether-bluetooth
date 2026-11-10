@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+is_powered() {
+  bluetoothctl show 2>/dev/null | sed -n 's/^[[:space:]]*Powered: //p' | head -n 1
+}
+
+case "${1:-status}" in
+  status)
+    if [ "$(is_powered)" = yes ]; then
+      printf 'ᛒ On\n'
+    else
+      printf 'ᛒ Off\n'
+    fi
+    ;;
+  toggle)
+    if [ "$(is_powered)" = yes ]; then
+      bluetoothctl power off >/dev/null
+    else
+      bluetoothctl power on >/dev/null
+    fi
+    ;;
+  *)
+    echo "Usage: aether-bluetooth [status|toggle]" >&2
+    exit 2
+    ;;
+esac

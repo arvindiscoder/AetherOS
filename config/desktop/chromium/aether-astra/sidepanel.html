@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aether Astra</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header>
+    <div class="mark">A</div>
+    <div>
+      <h1>Astra</h1>
+      <p>AetherOS assistant bridge</p>
+    </div>
+    <button id="settings-toggle" title="Settings" aria-label="Settings">⚙</button>
+  </header>
+
+  <section id="settings" class="hidden">
+    <label>OpenAI API key
+      <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-...">
+    </label>
+    <label>Model
+      <input id="model" type="text" value="gpt-4o-mini" spellcheck="false">
+    </label>
+    <p class="hint">The key is stored only in this browser profile
+      (<code>chrome.storage.local</code>) and sent directly to api.openai.com.</p>
+    <button id="save" class="primary">Save</button>
+  </section>
+
+  <main id="chat" aria-live="polite">
+    <article class="msg assistant">
+      <p>Hi. I can answer here with your API key, or open ChatGPT in a floating
+      window. Select text on any page and use <b>Ask Astra about…</b>.</p>
+    </article>
+  </main>
+
+  <form id="composer">
+    <textarea id="prompt" rows="3" placeholder="Ask Astra…  (Enter to send, Shift+Enter for newline)"></textarea>
+    <div class="row">
+      <button type="button" id="open-chatgpt">Open ChatGPT</button>
+      <button type="submit" class="primary">Send</button>
+    </div>
+  </form>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

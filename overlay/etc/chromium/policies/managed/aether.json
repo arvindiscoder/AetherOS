@@ -1,0 +1,15 @@
+{
+  "DefaultBrowserSettingEnabled": false,
+  "MetricsReportingEnabled": false,
+  "SearchSuggestEnabled": false,
+  "AlternateErrorPagesEnabled": false,
+  "BackgroundModeEnabled": false,
+  "HardwareAccelerationModeEnabled": true,
+  "PasswordManagerEnabled": false,
+  "AutofillAddressEnabled": false,
+  "AutofillCreditCardEnabled": false,
+  "UserFeedbackAllowed": false,
+  "PromotionsEnabled": false,
+  "PrivacySandboxPromptEnabled": false,
+  "UrlKeyedAnonymizedDataCollectionEnabled": false
+}
